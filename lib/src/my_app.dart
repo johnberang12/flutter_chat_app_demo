@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_chat_app/src/features/authentication/signin_screen.dart';
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -8,11 +7,12 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     //Home is changed to Sizedbox
     return MaterialApp(
-        title: 'Flutter Demo',
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-          useMaterial3: true,
-        ),
-        home: const SizedBox());
+      title: 'Flutter Demo',
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        useMaterial3: true,
+      ),
+      home: const SizedBox(),
+    );
   }
 }
