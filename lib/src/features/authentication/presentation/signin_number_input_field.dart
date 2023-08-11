@@ -49,7 +49,8 @@ class SigninNumberInputField extends ConsumerWidget with SigninValidator {
 
   Widget _countryCodePickerButton({required BuildContext context}) {
     return Consumer(builder: (context, ref, child) {
-      final selectedCountryCode = ref.watch(selectedCountryCodeProvider);
+      final flagEmoji = ref.watch(flagEmojiProvider);
+      final phoneCode = ref.watch(phoneCodeProvider);
       return TextButton(
         onPressed: () => pickCountryCode(
             context: context,
@@ -57,12 +58,16 @@ class SigninNumberInputField extends ConsumerWidget with SigninValidator {
               //on phone code select
 
               ref
-                  .read(selectedCountryCodeProvider.notifier)
-                  .update((state) => '${code.fladEmoji} +${code.phoneCode}');
+                  .read(phoneCodeProvider.notifier)
+                  .update((state) => '+${code.phoneCode}');
+
+              ref
+                  .read(flagEmojiProvider.notifier)
+                  .update((state) => code.fladEmoji);
               print('${code.fladEmoji} +${code.phoneCode}');
             }),
         child: Text(
-          selectedCountryCode,
+          '$flagEmoji +$phoneCode',
           style: Styles.k16(context),
         ),
       );
@@ -70,5 +75,6 @@ class SigninNumberInputField extends ConsumerWidget with SigninValidator {
   }
 }
 
-final selectedCountryCodeProvider =
-    StateProvider.autoDispose<String>((ref) => '🇮🇳 +91');
+final phoneCodeProvider = StateProvider.autoDispose<String>((ref) => '91');
+
+final flagEmojiProvider = StateProvider.autoDispose<String>((ref) => '🇮🇳');
