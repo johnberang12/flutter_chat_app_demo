@@ -18,4 +18,20 @@ mixin SigninValidator {
     const String errorText = "Invalid code";
     return showErrorText ? errorText : null;
   }
+
+  Future<void> submitPhoneNumber(
+      {required String phoneNumber,
+      required Future<void> Function() verifyPhoneNumber}) async {
+    if (canSubmitPhoneNumber(phoneNumber)) {
+      await verifyPhoneNumber();
+    }
+  }
+
+  Future<void> submitOtpCode(
+      {required String otpCode,
+      required Future<void> Function() verifyOtpCode}) async {
+    if (canSubmitOtp(otpCode)) {
+      await verifyOtpCode();
+    }
+  }
 }

@@ -3,6 +3,13 @@ import 'package:flutter_chat_app/src/constants/app_colors.dart';
 import 'package:flutter_chat_app/src/constants/sizes.dart';
 
 class Styles {
+  static TextStyle k48(BuildContext context) =>
+      TextStyle(fontSize: Sizes.p48, color: AppColors.textBlack80(context));
+  static TextStyle k48Grey(BuildContext context) =>
+      k32(context).copyWith(color: AppColors.textBlack50(context));
+  static TextStyle k48Bold(BuildContext context) =>
+      k32(context).copyWith(fontWeight: FontWeight.bold);
+
   static TextStyle k32(BuildContext context) =>
       TextStyle(fontSize: Sizes.p32, color: AppColors.textBlack80(context));
   static TextStyle k32Grey(BuildContext context) =>

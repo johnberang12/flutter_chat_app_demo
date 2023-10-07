@@ -4,7 +4,7 @@ class AppLoader {
   static Widget circularProgress(
           {double? value,
           Animation<Color>? valueColor,
-          Color? backgroundColor}) =>
+          Color? backgroundColor = Colors.amber}) =>
       Center(
           child: CircularProgressIndicator.adaptive(
               value: value,

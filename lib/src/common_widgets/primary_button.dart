@@ -43,10 +43,13 @@ class PrimaryButton extends HookWidget {
       ValueNotifier<bool> isLoading, IsMounted isMounted) async {
     if (onPressed != null) {
       isLoading.value = true;
+      // print('isLoading: ${isLoading.value}');
       await onPressed!();
       final mounted = isMounted();
+      // print('mounted: $mounted');
       if (mounted) {
         isLoading.value = false;
+        // print('isLoading: ${isLoading.value}');
       }
     }
   }

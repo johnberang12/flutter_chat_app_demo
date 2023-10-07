@@ -5,3 +5,7 @@
 # Xcode-related
 **/dgph
 **/xcuserdata/
+
+firebase_app_id_file.json
+Runner/GoogleService-info.plist
+Runner/TempGoogleService-info.plist
