@@ -64,7 +64,6 @@ class SigninNumberInputField extends ConsumerWidget with SigninValidator {
               ref
                   .read(flagEmojiProvider.notifier)
                   .update((state) => code.fladEmoji);
-              print('${code.fladEmoji} +${code.phoneCode}');
             }),
         child: Text(
           '$flagEmoji +$phoneCode',

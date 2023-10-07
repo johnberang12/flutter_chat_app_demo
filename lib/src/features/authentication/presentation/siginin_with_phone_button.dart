@@ -2,8 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_app/src/common_widgets/primary_button.dart';
-import 'package:flutter_chat_app/src/constants/sizes.dart';
 import 'package:flutter_chat_app/src/features/authentication/presentation/signin_form_type.dart';
+import 'package:flutter_chat_app/src/features/authentication/presentation/signin_screen_controller.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -16,15 +16,12 @@ class SigninWithPhoneButton extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final formType = ref.watch(signinFormTypeProvider);
+    final state = ref.watch(signinScreenControllerProvider);
     return Column(
       children: [
-        if (formType == SigninFormType.otpCode) ...[
-          _ResendButton(
-            resendCode: resendCode,
-          ),
-          gapH12,
-        ],
+        ...formType.resendButton(resendCode),
         PrimaryButton(
+          loading: state.isLoading,
           onPressed: onPressed,
           buttonTitle: formType.signinButtonText,
         ),
@@ -33,8 +30,8 @@ class SigninWithPhoneButton extends ConsumerWidget {
   }
 }
 
-class _ResendButton extends HookWidget {
-  const _ResendButton({required this.resendCode});
+class ResendButton extends HookWidget {
+  const ResendButton({super.key, required this.resendCode});
   final void Function() resendCode;
   @override
   Widget build(BuildContext context) {

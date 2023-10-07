@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
@@ -70,3 +71,44 @@ Future<bool?> showAlertDialog(
     ),
   );
 }
+
+Future<void> showExceptionAlertDialog({
+  required BuildContext context,
+  required String title,
+  required dynamic exception,
+}) =>
+    showAlertDialog(
+      context: context,
+      title: title,
+      content: exception.toString(),
+      defaultActionText: 'Ok',
+    );
+
+Future<void> showConfirmationDialog({
+  required BuildContext context,
+  required String content,
+  required FutureOr<void> Function() onConfirm,
+  FutureOr<void> Function()? onCancel,
+  String defaultActionText = "Ok",
+  String? cancelActionText,
+  String? title,
+  TextAlign contentAlignment = TextAlign.start,
+  TextStyle? contentStyle,
+}) =>
+    Future.delayed(const Duration(milliseconds: 5), () async {
+      final confirm = await showAlertDialog(
+        context: context,
+        title: title ?? "Alert",
+        content: content,
+        defaultActionText: defaultActionText,
+        cancelActionText: cancelActionText,
+        contentAlignment: contentAlignment,
+        contentStyle: contentStyle,
+      );
+      if (confirm == true) {
+        await onConfirm();
+      }
+      if (confirm == false && onCancel != null) {
+        await onCancel();
+      }
+    });
