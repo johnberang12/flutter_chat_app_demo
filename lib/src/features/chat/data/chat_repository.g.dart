@@ -124,5 +124,108 @@ class ChatsStreamProvider extends AutoDisposeStreamProvider<List<Chat>> {
     return _SystemHash.finish(hash);
   }
 }
+
+String _$paginatedChatsStreamHash() =>
+    r'bf2d35334ca94ccc7379adc34155e9e2c9874a09';
+typedef PaginatedChatsStreamRef
+    = AutoDisposeStreamProviderRef<(List<Chat>, DocumentSnapshot<Object?>?)>;
+
+/// See also [paginatedChatsStream].
+@ProviderFor(paginatedChatsStream)
+const paginatedChatsStreamProvider = PaginatedChatsStreamFamily();
+
+/// See also [paginatedChatsStream].
+class PaginatedChatsStreamFamily
+    extends Family<AsyncValue<(List<Chat>, DocumentSnapshot<Object?>?)>> {
+  /// See also [paginatedChatsStream].
+  const PaginatedChatsStreamFamily();
+
+  /// See also [paginatedChatsStream].
+  PaginatedChatsStreamProvider call(
+    String chatRoomId,
+    int pageSize,
+    DocumentSnapshot<Object?>? documentSnapshot,
+  ) {
+    return PaginatedChatsStreamProvider(
+      chatRoomId,
+      pageSize,
+      documentSnapshot,
+    );
+  }
+
+  @override
+  PaginatedChatsStreamProvider getProviderOverride(
+    covariant PaginatedChatsStreamProvider provider,
+  ) {
+    return call(
+      provider.chatRoomId,
+      provider.pageSize,
+      provider.documentSnapshot,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'paginatedChatsStreamProvider';
+}
+
+/// See also [paginatedChatsStream].
+class PaginatedChatsStreamProvider extends AutoDisposeStreamProvider<
+    (List<Chat>, DocumentSnapshot<Object?>?)> {
+  /// See also [paginatedChatsStream].
+  PaginatedChatsStreamProvider(
+    this.chatRoomId,
+    this.pageSize,
+    this.documentSnapshot,
+  ) : super.internal(
+          (ref) => paginatedChatsStream(
+            ref,
+            chatRoomId,
+            pageSize,
+            documentSnapshot,
+          ),
+          from: paginatedChatsStreamProvider,
+          name: r'paginatedChatsStreamProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$paginatedChatsStreamHash,
+          dependencies: PaginatedChatsStreamFamily._dependencies,
+          allTransitiveDependencies:
+              PaginatedChatsStreamFamily._allTransitiveDependencies,
+        );
+
+  final String chatRoomId;
+  final int pageSize;
+  final DocumentSnapshot<Object?>? documentSnapshot;
+
+  @override
+  bool operator ==(Object other) {
+    return other is PaginatedChatsStreamProvider &&
+        other.chatRoomId == chatRoomId &&
+        other.pageSize == pageSize &&
+        other.documentSnapshot == documentSnapshot;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, chatRoomId.hashCode);
+    hash = _SystemHash.combine(hash, pageSize.hashCode);
+    hash = _SystemHash.combine(hash, documentSnapshot.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member

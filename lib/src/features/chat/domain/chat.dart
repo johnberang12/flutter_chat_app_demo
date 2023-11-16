@@ -19,7 +19,6 @@ class Chat {
     this.type = ChatType.text,
     required this.senderId,
     required this.senderName,
-    required this.receiverId,
     this.read = false,
     this.active = true,
   });
@@ -31,7 +30,7 @@ class Chat {
   final ChatType type;
   final UserID senderId;
   final String senderName;
-  final UserID receiverId;
+
   final bool read;
   final bool active;
 
@@ -55,7 +54,6 @@ class Chat {
       type: type ?? this.type,
       senderId: senderId ?? this.senderId,
       senderName: senderName ?? this.senderName,
-      receiverId: receiverId ?? this.receiverId,
       read: read ?? this.read,
       active: active ?? this.active,
     );
@@ -70,7 +68,6 @@ class Chat {
       'type': type.name,
       'senderId': senderId,
       'senderName': senderName,
-      'receiverId': receiverId,
       'read': read,
       'active': active,
     };
@@ -94,7 +91,6 @@ class Chat {
       type: getChatType(map['type'] ?? ""),
       senderId: map['senderId'] ?? "",
       senderName: map['senderName'] ?? "",
-      receiverId: map['receiverId'] ?? "",
       read: map['read'] ?? false,
       active: map['active'] ?? true,
     );
@@ -107,7 +103,7 @@ class Chat {
 
   @override
   String toString() {
-    return 'Chat(id: $id, message: $message, photos: $photos, reactions: $reactions, type: $type, senderId: $senderId, senderName: $senderName, receiverId: $receiverId, read: $read, active: $active)';
+    return 'Chat(id: $id, message: $message, photos: $photos, reactions: $reactions, type: $type, senderId: $senderId, senderName: $senderName,  read: $read, active: $active)';
   }
 
   @override
@@ -121,7 +117,6 @@ class Chat {
         other.type == type &&
         other.senderId == senderId &&
         other.senderName == senderName &&
-        other.receiverId == receiverId &&
         other.read == read &&
         other.active == active;
   }
@@ -135,7 +130,6 @@ class Chat {
         type.hashCode ^
         senderId.hashCode ^
         senderName.hashCode ^
-        receiverId.hashCode ^
         read.hashCode ^
         active.hashCode;
   }

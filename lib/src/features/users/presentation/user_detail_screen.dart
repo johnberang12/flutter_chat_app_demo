@@ -1,17 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_app/src/constants/sizes.dart';
 import 'package:flutter_chat_app/src/constants/styles.dart';
+import 'package:flutter_chat_app/src/features/authentication/data/auth_repository.dart';
+import 'package:flutter_chat_app/src/features/chat/util/get_chat_room_id.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../app_router/app_router.dart';
 import '../domain/app_user.dart';
 
-class UserDetailScreen extends StatelessWidget {
+class UserDetailScreen extends ConsumerWidget {
   const UserDetailScreen({super.key, required this.appUser});
   final AppUser appUser;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final currentUser = ref.watch(authRepositoryProvider).currentUser;
     return Scaffold(
       appBar: AppBar(title: const Text('User Details')),
       body: Center(
@@ -26,8 +30,14 @@ class UserDetailScreen extends StatelessWidget {
           gapH32,
           ElevatedButton(
               style: ElevatedButton.styleFrom(backgroundColor: Colors.amber),
-              onPressed: () =>
-                  context.pushNamed(RoutePath.chatRoom.name, extra: appUser),
+              onPressed: currentUser == null
+                  ? null
+                  : () => context.pushNamed(RoutePath.chatRoom.name,
+                      pathParameters: {
+                        'chatRoomId':
+                            getChatRoomId(currentUser.uid, appUser.uid)
+                      },
+                      extra: appUser),
               child: Text(
                 'Chat',
                 style: Styles.k18Bold(context),

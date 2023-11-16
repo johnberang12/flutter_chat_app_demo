@@ -55,8 +55,19 @@
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>describe why your app needs access to the camera.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>describe why your app needs access to the microphone.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>describe why your app needs permission for the photo library.</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>fetch</string>
+		<string>remote-notification</string>
+	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
@@ -76,15 +87,5 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
-
-	<!-- photo library permission -->
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>describe why your app needs permission for the photo library.</string>
-	<!-- device camera permission -->
-	<key>NSCameraUsageDescription</key>
-	<string>describe why your app needs access to the camera.</string>
-	<!-- microphone permission -->
-	<key>NSMicrophoneUsageDescription</key>
-	<string>describe why your app needs access to the microphone.</string>
 </dict>
 </plist>

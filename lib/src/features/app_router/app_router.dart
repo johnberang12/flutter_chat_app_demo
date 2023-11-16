@@ -1,20 +1,24 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_chat_app/src/features/account/edit_profile_screen.dart';
+import 'package:flutter_chat_app/src/features/account/presentation/edit_profile_screen.dart';
 import 'package:flutter_chat_app/src/features/app_router/app_route_redirect.dart';
 import 'package:flutter_chat_app/src/features/app_router/app_router_listenable.dart';
 import 'package:flutter_chat_app/src/features/app_router/scaffold_with_nav_bar.dart';
 import 'package:flutter_chat_app/src/features/authentication/signin_screen.dart';
+import 'package:flutter_chat_app/src/features/chat/sub_features/group_chat/chat_members_screen.dart';
+import 'package:flutter_chat_app/src/features/chat/sub_features/group_chat/create_group_chat_screen.dart';
+import 'package:flutter_chat_app/src/features/chat/sub_features/group_chat/group_chat_screen.dart';
 import 'package:flutter_chat_app/src/features/settings/settings_screen.dart';
 import 'package:flutter_chat_app/src/features/users/presentation/name_registration_screen.dart';
 import 'package:flutter_chat_app/src/features/users/presentation/user_detail_screen.dart';
 import 'package:flutter_chat_app/src/features/welcome/welcome_screen.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import '../account/account_screen.dart';
-import '../chat/presentation/chat_room_screen/chat_room_screen.dart';
+import '../account/presentation/account_screen.dart';
+import '../chat/domain/chat_room.dart';
+import '../chat/presentation/chat_room_screen/chat_screen.dart';
 import '../chat/presentation/chats_tab_screen/chats_tab_screen.dart';
 import '../users/domain/app_user.dart';
-import '../users/home_screen.dart';
+import '../users/presentation/home_screen.dart';
 
 enum RoutePath {
   root(path: '/'),
@@ -28,8 +32,12 @@ enum RoutePath {
   account(path: 'account'),
   userDetails(path: 'userDetails'),
   chatsTab(path: 'chats'),
-  chatRoom(path: 'chatRoom'),
-  editProfile(path: 'editProfile');
+  chatRoom(path: 'chatRoom/:chatRoomId'),
+  createGroupChat(path: 'createGroupChat'),
+  groupChatScreen(path: 'groupChatScreen/:chatRoomId'),
+  chatMembersScreen(path: 'chatMembersScreen'),
+  editProfile(path: 'editProfile'),
+  userPagination(path: 'userPagination');
 
   const RoutePath({required this.path});
   final String path;
@@ -85,8 +93,13 @@ final goRouterProvider = Provider<GoRouter>((ref) {
                                   path: RoutePath.chatRoom.path,
                                   name: RoutePath.chatRoom.name,
                                   builder: (context, state) {
-                                    final peer = state.extra as AppUser;
-                                    return ChatRoomScreen(peerUser: peer);
+                                    final chatRoomId =
+                                        state.pathParameters['chatRoomId']!;
+                                    final peerUser = state.extra as AppUser;
+                                    return ChatScreen(
+                                      chatRoomId: chatRoomId,
+                                      peerUser: peerUser,
+                                    );
                                   }),
                             ]),
                       ],
@@ -107,6 +120,27 @@ final goRouterProvider = Provider<GoRouter>((ref) {
                   builder: (context, state) {
                     final appUser = state.extra as AppUser;
                     return UserDetailScreen(appUser: appUser);
+                  }),
+              GoRoute(
+                  path: RoutePath.createGroupChat.path,
+                  name: RoutePath.createGroupChat.name,
+                  builder: (context, state) {
+                    return const CreateGroupChatScreen();
+                  }),
+              GoRoute(
+                  path: RoutePath.groupChatScreen.path,
+                  name: RoutePath.groupChatScreen.name,
+                  builder: (context, state) {
+                    final chatRoomId = state.pathParameters['chatRoomId']!;
+
+                    return GroupChatScreen(chatRoomId: chatRoomId);
+                  }),
+              GoRoute(
+                  path: RoutePath.chatMembersScreen.path,
+                  name: RoutePath.chatMembersScreen.name,
+                  builder: (context, state) {
+                    final chatRoom = state.extra as ChatRoom;
+                    return ChatMembersScreen(chatRoom: chatRoom);
                   }),
               GoRoute(
                   path: RoutePath.editProfile.path,

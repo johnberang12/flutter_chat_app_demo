@@ -4,12 +4,13 @@ class WidgetLifecyle extends StatefulWidget {
   const WidgetLifecyle(
       {super.key,
       required this.child,
-      required,
+      this.init,
       this.resumed,
       this.inactive,
       this.pause,
       this.detached});
   final Widget child;
+  final void Function()? init;
   final void Function()? resumed;
   final void Function()? inactive;
   final void Function()? pause;
@@ -26,6 +27,9 @@ class _WidgetLifecyleState extends State<WidgetLifecyle>
     super.initState();
 
     WidgetsBinding.instance.addObserver(this);
+    if (widget.init != null) {
+      widget.init!();
+    }
   }
 
   @override

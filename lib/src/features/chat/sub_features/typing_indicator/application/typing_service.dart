@@ -23,8 +23,7 @@ class TypingService {
 
   ///used to toggle the typing indicator when typing an when exiting the
   ///chat room screen
-  Future<void> toggleTyping(ChatRoom? room, bool isTyping) async {
-    if (room == null) return;
+  Future<void> toggleTyping(ChatRoom room, bool isTyping) async {
     final userId = ref.read(authRepositoryProvider).currentUser?.uid;
     if (userId == null) return;
     final userData = room.members.members[userId];
@@ -37,16 +36,16 @@ class TypingService {
   }
 
   ///used to toggle typing indicator
-  ///after sending a chat
+
   void updateTyping(
       {required ChatRoom room,
       required UserID memberId,
       required bool isTyping,
       required WriteBatch batch}) {
-    final receiverData = room.members.members[memberId];
-    if (receiverData != null) {
+    final memberData = room.members.members[memberId];
+    if (memberData != null) {
       ///update typing to true
-      final newData = receiverData.copyWith(isTyping: isTyping);
+      final newData = memberData.copyWith(isTyping: isTyping);
       final data = {'members.$memberId': newData.toMap()};
       batch.update(_chatRoomRef(room.id), data);
     }

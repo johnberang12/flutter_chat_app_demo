@@ -1,9 +1,8 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
-import 'dart:io';
 
-import 'package:flutter_chat_app/src/features/image_picker/presentation/image_editing_controller.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../../../common_widgets/photo_editing_controller.dart';
 import '../data/app_image_picker.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'app_image_picker_service.g.dart';
@@ -13,20 +12,20 @@ class AppImagePickerService {
   final AppImagePicker picker;
 
   Future<void> pickeCameraImage({
-    required ImageEditingController<File> controller,
+    required PhotoEditingController controller,
     required bool allowMultiple,
   }) async {
     final image = await picker.pickeImage(source: ImageSource.camera);
     if (image == null) return;
     if (allowMultiple) {
-      controller.addItem(image);
+      controller.add(image);
     } else {
       controller.replace(image);
     }
   }
 
   Future<void> pickGalleryImage({
-    required ImageEditingController<File> controller,
+    required PhotoEditingController controller,
     required bool allowMultiple,
   }) async {
     if (allowMultiple) {
@@ -39,6 +38,14 @@ class AppImagePickerService {
       controller.replace(image);
     }
   }
+
+  // Future<void> testPickGalleryImage({
+  //   required ImageList controller,
+  // }) async {
+  //   final images = await picker.pickMultiImage();
+  //   if (images.isEmpty) return;
+  //   controller.addAll(images);
+  // }
 }
 
 @Riverpod(keepAlive: true)

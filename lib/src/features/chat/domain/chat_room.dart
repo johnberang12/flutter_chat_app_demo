@@ -12,6 +12,7 @@ typedef ChatRoomID = String;
 class ChatRoom {
   ChatRoom({
     required this.id,
+    this.chatRoomTitle = '',
     required this.memberIds,
     required this.members,
     required this.activity,
@@ -20,6 +21,7 @@ class ChatRoom {
     this.deletedAt,
   });
   final ChatRoomID id;
+  final String chatRoomTitle;
   final List<String> memberIds;
   final RoomMembers members;
   final RoomActivity activity;
@@ -29,6 +31,7 @@ class ChatRoom {
 
   ChatRoom copyWith({
     ChatRoomID? id,
+    String? chatRoomName,
     List<String>? memberIds,
     RoomMembers? members,
     RoomActivity? activity,
@@ -38,6 +41,7 @@ class ChatRoom {
   }) {
     return ChatRoom(
       id: id ?? this.id,
+      chatRoomTitle: chatRoomName ?? chatRoomTitle,
       memberIds: memberIds ?? this.memberIds,
       members: members ?? this.members,
       activity: activity ?? this.activity,
@@ -50,6 +54,7 @@ class ChatRoom {
   Map<String, dynamic> toMap() {
     final chatRoomMap = <String, dynamic>{
       'id': id,
+      'chatRoomTitle': chatRoomTitle,
       'memberIds': memberIds,
       'members': members.toMap(),
       'activity': activity.toMap(),
@@ -65,8 +70,10 @@ class ChatRoom {
   static ChatRoom? fromMap(Map<String, dynamic>? map) {
     if (map == null) return null;
     final deletedAt = map['deletedAt'];
+
     return ChatRoom(
       id: map['id'] ?? "",
+      chatRoomTitle: map['chatRoomTitle'] ?? '',
       memberIds: List<String>.from(map['memberIds'] ?? []),
       members: RoomMembers.fromMap(map['members']),
       activity: RoomActivity.fromMap(map['activity'] ?? {}),
@@ -83,7 +90,7 @@ class ChatRoom {
 
   @override
   String toString() {
-    return 'ChatRoom(id: $id, memberIds: $memberIds, members: $members, activity: $activity, isGroup: $isGroup, deleted: $deleted, deletedAt: $deletedAt)';
+    return 'ChatRoom(id: $id, chatRoomTitle: $chatRoomTitle, memberIds: $memberIds, members: $members, activity: $activity, isGroup: $isGroup, deleted: $deleted, deletedAt: $deletedAt)';
   }
 
   @override
@@ -91,6 +98,7 @@ class ChatRoom {
     if (identical(this, other)) return true;
 
     return other.id == id &&
+        other.chatRoomTitle == chatRoomTitle &&
         listEquals(other.memberIds, memberIds) &&
         other.members == members &&
         other.activity == activity &&
@@ -102,6 +110,7 @@ class ChatRoom {
   @override
   int get hashCode {
     return id.hashCode ^
+        chatRoomTitle.hashCode ^
         memberIds.hashCode ^
         members.hashCode ^
         activity.hashCode ^

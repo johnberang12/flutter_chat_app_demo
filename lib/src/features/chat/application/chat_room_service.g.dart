@@ -21,7 +21,7 @@ final chatRoomServiceProvider = Provider<ChatRoomService>.internal(
 );
 
 typedef ChatRoomServiceRef = ProviderRef<ChatRoomService>;
-String _$chatRoomStreamHash() => r'6cf232fbedbacdb8c881b80f5cdeebfe22e1f4c0';
+String _$chatRoomStreamHash() => r'5b02950e9455bec43b46f02cd638788c86c3fa3b';
 
 /// Copied from Dart SDK
 class _SystemHash {

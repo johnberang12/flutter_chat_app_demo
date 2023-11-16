@@ -18,18 +18,25 @@ class ChatBadgeService {
       .docRef(docPath: DBPath.chatRoom(chatRoomId));
 
   ///used to increment or reset badge count
-  void incrementBadge(
+  void incrementBadges(
       {required ChatRoom room,
-      required UserID memberId,
+      required UserID userId,
       required bool increment,
       required WriteBatch batch}) {
-    final receiverData = room.members.members[memberId];
-    if (receiverData != null) {
-      ///increment badge count
-      final badgeCount = increment ? receiverData.badgeCount + 1 : 0;
-      final newData = receiverData.copyWith(badgeCount: badgeCount);
-      final data = {'members.$memberId': newData.toMap()};
-      batch.update(_chatRoomRef(room.id), data);
+    for (var id in room.memberIds) {
+      if (id == userId) {
+        // we dont want to increment the badge of the current user sending the message
+        //so we use continue to skip.
+        continue;
+      }
+      final receiverData = room.members.members[id];
+      if (receiverData != null) {
+        ///increment badge count
+        final badgeCount = increment ? receiverData.badgeCount + 1 : 0;
+        final newData = receiverData.copyWith(badgeCount: badgeCount);
+        final data = {'members.$id': newData.toMap()};
+        batch.update(_chatRoomRef(room.id), data);
+      }
     }
   }
 }

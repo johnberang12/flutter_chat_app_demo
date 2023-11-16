@@ -21,12 +21,28 @@ final searchServiceProvider = Provider<SearchService>.internal(
 );
 
 typedef SearchServiceRef = ProviderRef<SearchService>;
-String _$searchedUsersHash() => r'ac2c4f7c6bc31ee035115473e410ca3d3758bab1';
+String _$searchedStreamUsersHash() =>
+    r'2f02b72c57a6e946304ae9a4e89ab6f98479d7fc';
+
+/// See also [searchedStreamUsers].
+@ProviderFor(searchedStreamUsers)
+final searchedStreamUsersProvider =
+    AutoDisposeStreamProvider<List<AppUser>>.internal(
+  searchedStreamUsers,
+  name: r'searchedStreamUsersProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$searchedStreamUsersHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef SearchedStreamUsersRef = AutoDisposeStreamProviderRef<List<AppUser>>;
+String _$searchedUsersHash() => r'a42d80808360d66a641c72d3d8ba0be7032cfc21';
 
 /// See also [searchedUsers].
 @ProviderFor(searchedUsers)
-final searchedUsersProvider =
-    AutoDisposeFutureProvider<List<AppUser?>>.internal(
+final searchedUsersProvider = AutoDisposeFutureProvider<List<AppUser>>.internal(
   searchedUsers,
   name: r'searchedUsersProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
@@ -36,6 +52,6 @@ final searchedUsersProvider =
   allTransitiveDependencies: null,
 );
 
-typedef SearchedUsersRef = AutoDisposeFutureProviderRef<List<AppUser?>>;
+typedef SearchedUsersRef = AutoDisposeFutureProviderRef<List<AppUser>>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member

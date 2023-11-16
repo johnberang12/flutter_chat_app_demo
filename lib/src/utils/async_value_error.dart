@@ -3,7 +3,7 @@ import 'package:flutter_chat_app/src/common_widgets/alert_dialogs.dart';
 import 'package:flutter_chat_app/src/exceptions/app_exception.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-extension AsyncValueError on AsyncValue {
+extension AsyncValueX on AsyncValue {
   void showAlertDialogOnError(BuildContext context) {
     if (!isLoading && hasError) {
       if (error is AppException) {

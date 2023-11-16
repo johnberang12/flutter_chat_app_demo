@@ -6,14 +6,16 @@ import '../../../../../constants/app_colors.dart';
 class TypingIndicatorWidget extends StatelessWidget {
   const TypingIndicatorWidget(
       {super.key,
+      required this.isGroup,
       this.color,
       this.padding,
-      this.size = 50.0,
+      this.size = 40.0,
       this.mainAxisAlignment = MainAxisAlignment.start});
   final Color? color;
   final EdgeInsetsGeometry? padding;
   final MainAxisAlignment mainAxisAlignment;
   final double size;
+  final bool isGroup;
 
   @override
   Widget build(BuildContext context) {
@@ -27,6 +29,7 @@ class TypingIndicatorWidget extends StatelessWidget {
             color: color ?? AppColors.grey600,
           ),
         ),
+        if (isGroup) ...[const Text('Someone is typing...')]
       ],
     );
   }

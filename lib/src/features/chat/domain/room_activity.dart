@@ -14,14 +14,14 @@ class RoomActivity {
     required this.createdAt,
     required this.senderName,
     this.type = RoomActivityType.sendChat,
-    this.read = false,
+    this.read = const [],
   });
   final String lastMessage;
   final UserID senderId;
   final DateTime createdAt;
   final String senderName;
   final RoomActivityType type;
-  final bool read;
+  final List<String> read;
 
   RoomActivity copyWith(
       {String? lastMessage,
@@ -29,7 +29,7 @@ class RoomActivity {
       DateTime? createdAt,
       String? senderName,
       RoomActivityType? type,
-      bool? read}) {
+      List<String>? read}) {
     return RoomActivity(
       lastMessage: lastMessage ?? this.lastMessage,
       senderId: senderId ?? this.senderId,
@@ -67,7 +67,7 @@ class RoomActivity {
         createdAt: (map['createdAt'] as Timestamp).toDate(),
         senderName: map['senderName'] ?? "",
         type: getActivityType(map['type'] ?? ""),
-        read: map['read'] ?? false);
+        read: List<String>.from(map['read'] ?? []));
   }
 
   String toJson() => json.encode(toMap());

@@ -19,3 +19,27 @@ final settingsScreenControllerProvider =
     StateNotifierProvider<SettingsScreenController, AsyncValue<void>>((ref) =>
         SettingsScreenController(
             listenable: ref.watch(appRouterListenableProvider)));
+
+
+
+
+
+
+
+
+
+
+
+// @riverpod
+// class SettingsScreenController extends _$SettingsScreenController {
+//   @override
+//   FutureOr<void> build() {}
+//   Future<void> logout(bool Function() mounted) async {
+//     state = const AsyncLoading();
+//     final newState = await AsyncValue.guard(
+//         () => ref.read(appRouterListenableProvider).signOut());
+//     if (mounted()) {
+//       state = newState;
+//     }
+//   }
+// }

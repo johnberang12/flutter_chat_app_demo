@@ -1,8 +1,10 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_chat_app/src/services/firestore/db_path.dart';
 import 'package:flutter_chat_app/src/services/firestore/firestore_service.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../users/domain/app_user.dart';
+import '../domain/chat_member.dart';
 import '../domain/chat_room.dart';
 part 'chat_room_repository.g.dart';
 
@@ -12,11 +14,28 @@ class ChatRoomRepository {
   }) : _service = service;
   final FirestoreService _service;
 
+  DocumentReference _chatRoomRef(ChatRoomID chatRoomId) =>
+      _service.docRef(docPath: DBPath.chatRoom(chatRoomId));
+
   Future<void> createChatRoom(ChatRoom chatRoom) => _service.setData(
       path: DBPath.chatRoom(chatRoom.id), data: chatRoom.toMap());
 
   Future<void> updateChatRoom(ChatRoomID roomId, Map<String, dynamic> data) =>
       _service.updateDoc(path: DBPath.chatRoom(roomId), data: data);
+
+  void batchUpdateMemberData(
+      {required ChatRoomID chatRoomId,
+      required WriteBatch batch,
+      required ChatMemberData updatedMemberData}) {
+    batch.update(_chatRoomRef(chatRoomId), updatedMemberData.toMap());
+  }
+
+  void batchUpdateChatRoom(
+      {required ChatRoomID chatRoomId,
+      required Map<String, dynamic> data,
+      required WriteBatch batch}) {
+    batch.update(_chatRoomRef(chatRoomId), data);
+  }
 
   Future<void> deleteChatRoom(ChatRoomID id) =>
       _service.deleteData(path: DBPath.chatRoom(id));

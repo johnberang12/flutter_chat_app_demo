@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_app/src/common_widgets/async_value_when.dart';
 import 'package:flutter_chat_app/src/common_widgets/center_text.dart';
+import 'package:flutter_chat_app/src/features/app_router/app_router.dart';
 import 'package:flutter_chat_app/src/features/chat/sub_features/delete_chat_room/delete_chat_room_controller.dart';
 
 import 'package:flutter_chat_app/src/features/chat/sub_features/delete_chat_room/time_left_provider.dart';
 import 'package:flutter_chat_app/src/utils/async_value_error.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
+import '../../../../constants/sizes.dart';
 import '../../application/chat_room_service.dart';
 import '../../domain/chat_room.dart';
 import 'chat_room_list_tile.dart';
@@ -14,21 +16,38 @@ import 'chat_room_list_tile.dart';
 class ChatsTabScreen extends ConsumerWidget {
   const ChatsTabScreen({super.key});
 
+  Future<void> _onSelectMenu(WidgetRef ref, int? value) async {
+    if (value == null) return;
+    if (value == 0) {
+      ref.read(goRouterProvider).pushNamed(RoutePath.createGroupChat.name);
+    }
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     ref.listen<AsyncValue>(deleteChatRoomControllerProvider,
         (previous, next) => next.showAlertDialogOnError(context));
     // final state = ref.watch(chatsScreenControllerProvider);
     return Scaffold(
-      appBar: AppBar(title: const Text('Chats Screen')),
+      appBar: AppBar(
+        title: const Text('Chats Screen'),
+        actions: [
+          PopupMenuButton(
+              onSelected: (value) => _onSelectMenu(ref, value),
+              itemBuilder: (context) => [
+                    const PopupMenuItem(
+                        value: 0,
+                        child: Row(
+                          children: [
+                            Icon(Icons.group_add),
+                            gapW8,
+                            Text('Create Group Chat')
+                          ],
+                        )),
+                  ])
+        ],
+      ),
       body: const ChatsScreenBody(),
-      // floatingActionButton: FloatingActionButton(
-      //     backgroundColor: Colors.amber,
-      //     onPressed: () =>
-      //         ref.read(chatsScreenControllerProvider.notifier).createChatRoom(),
-      //     child: state.isLoading
-      //         ? AppLoader.circularProgress()
-      //         : const Icon(Icons.add)),
     );
   }
 }

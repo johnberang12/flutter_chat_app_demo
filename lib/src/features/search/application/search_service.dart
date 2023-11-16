@@ -1,8 +1,10 @@
+import 'package:flutter_chat_app/src/features/authentication/data/auth_repository.dart';
 import 'package:flutter_chat_app/src/features/search/data/user_search_repository.dart';
 import 'package:flutter_chat_app/src/features/search/domain/search.dart';
 
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
+import '../../users/data/app_user_repository.dart';
 import '../../users/domain/app_user.dart';
 import '../presentation/searches_controller.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -14,7 +16,7 @@ class SearchService {
 
   Future<void> fetchSearchResults(String search) async {
     if (search.isNotEmpty) {
-      await Future.delayed(const Duration(milliseconds: 500));
+      // await Future.delayed(const Duration(milliseconds: 500));
 
       ///update searchProvider
       ref.read(searchQueryProvider.notifier).update((_) => search);
@@ -26,13 +28,14 @@ class SearchService {
     }
   }
 
-  // Stream<List<AppUser?>> searchedAppUsers(String search) {
-  //   final result = ref.read(appUserRepositoryProvider).watchUsers();
-  //   final users = result.map((users) => users
-  //       .where((user) => user != null && user.name.contains(search))
-  //       .toList());
-  //   return users;
-  // }
+  Stream<List<AppUser>> searchedAppUsers(String search) {
+    final user = ref.read(authRepositoryProvider).currentUser;
+    final result =
+        ref.read(appUserRepositoryProvider).watchUsers(user?.uid ?? '');
+    final users = result.map(
+        (users) => users.where((user) => user.name.contains(search)).toList());
+    return users;
+  }
 }
 
 @Riverpod(keepAlive: true)
@@ -40,15 +43,17 @@ SearchService searchService(SearchServiceRef ref) => SearchService(ref: ref);
 
 final searchQueryProvider = StateProvider((ref) => '');
 
-// @riverpod
-// Stream<List<AppUser?>> searchedStreamUsers(SearchedStreamUsersRef ref) {
-//   final searchQuery = ref.watch(searchQueryProvider);
-//   return ref.watch(searchServiceProvider).searchedAppUsers(searchQuery);
-// }
+@riverpod
+Stream<List<AppUser>> searchedStreamUsers(SearchedStreamUsersRef ref) {
+  final searchQuery = ref.watch(searchQueryProvider);
+
+  return ref.watch(searchServiceProvider).searchedAppUsers(searchQuery);
+}
 
 @riverpod
-FutureOr<List<AppUser?>> searchedUsers(Ref ref) {
+FutureOr<List<AppUser>> searchedUsers(Ref ref) {
   final searchQuery = ref.watch(searchQueryProvider);
+  if (searchQuery.isEmpty) return Future<List<AppUser>>.value([]);
   return ref
       .watch(userSearchRepositoryProvider)
       .fetchSearchedUsers(searchQuery);

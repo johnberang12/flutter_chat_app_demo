@@ -27,8 +27,10 @@ class SearchEngine {
   Future<List<T>> getObjects<T>(
           {required AlgoliaQuery query,
           required T Function(Map<String, dynamic> data) builder}) =>
-      query.getObjects().then(
-          (snapshot) => snapshot.hits.map((e) => builder(e.data)).toList());
+      query.getObjects().then((snapshot) => snapshot.hits
+          .map((e) => builder(e.data))
+          .where((element) => element != null)
+          .toList());
 
   AlgoliaQuery filters(AlgoliaQuery query, SearchFilter searchFilter) =>
       query.filters(searchFilter);

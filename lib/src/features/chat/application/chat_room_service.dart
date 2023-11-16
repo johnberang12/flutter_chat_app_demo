@@ -10,7 +10,6 @@ import 'package:flutter_chat_app/src/services/firestore/firestore_service.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../../services/firestore/db_path.dart';
 import '../../users/domain/app_user.dart';
 import '../data/chat_room_repository.dart';
 import '../domain/chat.dart';
@@ -22,27 +21,43 @@ class ChatRoomService {
   final Ref ref;
 
   ChatRoomRepository _chatRoomRepo() => ref.read(chatRoomRepositoryProvider);
-  DocumentReference _chatRoomRef(ChatRoomID chatRoomId) => ref
-      .read(firestoreServiceProvider)
-      .docRef(docPath: DBPath.chatRoom(chatRoomId));
 
   Future<ChatRoom> createChatRoom(
       {required ChatRoom? chatRoom,
       required Chat chat,
       required AppUser peerUser}) async {
     if (chatRoom != null) return chatRoom;
-    final newChatRoom = _newChatRoom(chat, peerUser);
+    final userPhotoUrl =
+        ref.read(authRepositoryProvider).currentUser?.photoURL ?? "";
+    final newChatRoom = _createNewChatRoom(chat, peerUser, userPhotoUrl);
     await _chatRoomRepo().createChatRoom(newChatRoom);
     return newChatRoom;
   }
 
   ///used to set lastActivity
   void setLastActivity(
-      {required ChatRoomID chatRoomId,
+      {required ChatRoom chatRoom,
       required Chat chat,
       required WriteBatch batch}) {
-    final data = {'activity': _roomActivity(chat).toMap()};
-    batch.update(_chatRoomRef(chatRoomId), data);
+    final updatedMembers = {
+      //iterate to all chat members
+      for (var entry in chatRoom.members.members.entries)
+        entry.key: entry.key == chat.senderId
+            ? entry.value
+                .copyWith(isTyping: false, lastReadChat: chat.id)
+                .toMap() //update typing to false and lastReadChat for the sender
+            : entry.value
+                .copyWith(badgeCount: entry.value.badgeCount + 1)
+                .toMap() //increment badgeCount of the receivers
+    };
+
+    final data = {
+      'activity': _createRoomActivity(chat).toMap(),
+      'members': updatedMembers //conver the entry values to map
+    };
+
+    _chatRoomRepo()
+        .batchUpdateChatRoom(chatRoomId: chatRoom.id, data: data, batch: batch);
   }
 
   ///used to mark last activity as read
@@ -51,17 +66,19 @@ class ChatRoomService {
       required UserID userId,
       required WriteBatch batch}) {
     ///dont update if the sender is me
-    if (room.activity.read) return;
+    if (room.activity.read.contains(userId)) return;
     if (room.activity.senderId == userId) return;
-    final newActivity = room.activity.copyWith(read: true);
+    final newActivity =
+        room.activity.copyWith(read: [...room.activity.read, userId]);
     final data = {'activity': newActivity.toMap()};
-    batch.update(_chatRoomRef(room.id), data);
+    _chatRoomRepo()
+        .batchUpdateChatRoom(chatRoomId: room.id, data: data, batch: batch);
   }
 
-  Future<void> exitChatRoom(ChatRoom? chatRoom) async {
+  Future<void> exitChatRoom(ChatRoom chatRoom) async {
     try {
       final userId = ref.read(authRepositoryProvider).currentUser?.uid;
-      if (userId == null || chatRoom == null) return;
+      if (userId == null) return;
       final myData = chatRoom.members.members[userId];
       if (myData == null) return;
       final isRoom = myData.isRoom;
@@ -69,8 +86,7 @@ class ChatRoomService {
       if (!isTyping && !isRoom) return;
       final myNewData =
           myData.copyWith(isRoom: false, isTyping: false, badgeCount: 0);
-      await ref
-          .read(chatRoomRepositoryProvider)
+      await _chatRoomRepo()
           .updateChatRoom(chatRoom.id, {'members.$userId': myNewData.toMap()});
     } catch (e) {
       return;
@@ -88,10 +104,10 @@ ChatRoomService chatRoomService(ChatRoomServiceRef ref) =>
 Stream<ChatRoom?> chatRoomStream(ChatRoomStreamRef ref, ChatRoomID chatRoomId) {
 // final userId = ref.read(authRepositoryProvider).currentUser?.uid ?? 'defaultUserId';
 // final reversedRoomId = userId + peerId;
-  ref.onDispose(() {
-    print('chatRoomProvider disposed.....');
-  });
-  return ref.watch(chatRoomRepositoryProvider).watchChatRoom(chatRoomId);
+  final repo = ref.watch(chatRoomRepositoryProvider);
+
+  // ref.onDispose(() {});
+  return repo.watchChatRoom(chatRoomId);
 }
 
 @riverpod
@@ -102,38 +118,46 @@ Stream<List<ChatRoom?>> chatRoomsStream(ChatRoomsStreamRef ref) {
   return ref.watch(chatRoomRepositoryProvider).watchChatRooms(userId);
 }
 
-final chatRoomStreamProvider2 =
-    StreamProvider.autoDispose.family<ChatRoom?, ChatRoomID>((ref, chatRoomId) {
-  ref.onDispose(() {
-    print('chatRoomProvider disposed.....');
-  });
-  return ref.watch(chatRoomRepositoryProvider).watchChatRoom(chatRoomId);
-});
+// final chatRoomStreamProvider2 =
+//     StreamProvider.autoDispose.family<ChatRoom?, ChatRoomID>((ref, chatRoomId) {
+//   ref.onDispose(() {});
+//   return ref.watch(chatRoomRepositoryProvider).watchChatRoom(chatRoomId);
+// });
 
 extension ChatRoomServiceX on ChatRoomService {
-  ChatRoom _newChatRoom(Chat chat, AppUser peerUser) {
-    final memberIds = [chat.senderId, chat.receiverId];
+  ChatRoom _createNewChatRoom(
+      Chat chat, AppUser peerUser, String userPhotoUrl) {
+    final memberIds = [chat.senderId, peerUser.uid];
     final chatRoom = ChatRoom(
-        id: getChatRoomId(chat.senderId, chat.receiverId),
+        id: getChatRoomId(chat.senderId, peerUser.uid),
         memberIds: memberIds,
-        members: _roomMembers(chat, peerUser),
-        activity: _roomActivity(chat));
+        members: _createPrivateRoomMembers(chat, peerUser, userPhotoUrl),
+        activity: _createRoomActivity(chat));
     return chatRoom;
   }
 
-  RoomMembers _roomMembers(Chat chat, AppUser peerUser) {
+  RoomMembers _createPrivateRoomMembers(
+      Chat chat, AppUser peerUser, String userPhotoUrl) {
     final me = ChatMember(
-        userId: chat.senderId, data: ChatMemberData(name: chat.senderName));
-    final peer = ChatMember(
-        userId: peerUser.uid, data: ChatMemberData(name: peerUser.name));
-    final members = RoomMembers().addMembers([me, peer]);
+        userId: chat.senderId,
+        data: ChatMemberData(
+            uid: chat.senderId, name: chat.senderName, imageUrl: userPhotoUrl));
+
+    final peerMember = ChatMember(
+        userId: peerUser.uid,
+        data: ChatMemberData(
+            uid: peerUser.uid,
+            name: peerUser.name,
+            imageUrl: peerUser.photoUrl));
+    final members = RoomMembers().addMembers([me, peerMember]);
     return members;
   }
 
   ///create RoomActivity object
-  RoomActivity _roomActivity(Chat chat) {
+  RoomActivity _createRoomActivity(Chat chat) {
     final now = currentDate();
     final activity = RoomActivity(
+        read: [chat.senderId],
         lastMessage: chat.message,
         senderId: chat.senderId,
         createdAt: now,
@@ -141,6 +165,8 @@ extension ChatRoomServiceX on ChatRoomService {
         type: chat.photos.isNotEmpty
             ? RoomActivityType.sendAttachment
             : RoomActivityType.sendChat);
+    // print('chat: $chat');
+
     return activity;
   }
 }

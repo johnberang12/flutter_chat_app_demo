@@ -57,9 +57,9 @@ class AppUser {
       uid: map['uid'] ?? "",
       phoneNumber: map['phoneNumber'] ?? "",
       title: map['title'] ?? "",
-      name: map['name'] ?? "",
+      name: map['name'],
       email: map['email'] ?? "",
-      photoUrl: map['photoUrl'] ?? "",
+      photoUrl: map['photoUrl'],
     );
   }
 

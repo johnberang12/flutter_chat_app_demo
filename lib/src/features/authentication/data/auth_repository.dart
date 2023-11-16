@@ -56,8 +56,20 @@ class AuthRepository {
   }
 
   Future<void> signOut() async {
+    for (var i = 0; i < 4; i++) {
+      await Future.delayed(const Duration(milliseconds: 1000));
+    }
+    throw Exception('Logout failed');
     await handleAsyncError(
         title: 'Sign out failed', operation: () => auth.signOut());
+    // throw Exception('Something went wrong...');
+  }
+
+  Future<void> deleteAccount() async {
+    for (var i = 0; i < 4; i++) {
+      await Future.delayed(const Duration(milliseconds: 1000));
+    }
+    throw Exception('Something went wrong');
   }
 
   Future<void> updateDisplayName(String displayName) async {

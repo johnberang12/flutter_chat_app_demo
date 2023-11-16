@@ -9,11 +9,12 @@ class UserSearchRepository {
   UserSearchRepository({required SearchEngine engine}) : _engine = engine;
   final SearchEngine _engine;
 
-  Future<List<AppUser?>> fetchSearchedUsers(SearchQuery searchQuery) async {
+  Future<List<AppUser>> fetchSearchedUsers(SearchQuery searchQuery) async {
     const index = 'users_index';
     final query = _engine.query(index, searchQuery);
     final results = await _engine.getObjects(
-        query: query, builder: (data) => AppUser.fromMap(data));
+        query: query, builder: (data) => AppUser.fromMap(data)!);
+    // print('results: $results');
     return results;
   }
 }

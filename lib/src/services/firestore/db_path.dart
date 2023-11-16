@@ -10,7 +10,7 @@ class DBPath {
   static String chatRooms() => 'rooms';
 
   static String chat(ChatRoomID chatRoomId, ChatID chatId) =>
-      '${chatRoom(chatRoomId)}/chats/$chatId';
+      'rooms/$chatRoomId/chats/$chatId';
   static String chats(ChatRoomID chatRoomId) => '${chatRoom(chatRoomId)}/chats';
 
   ///you can add more paths here if needed
